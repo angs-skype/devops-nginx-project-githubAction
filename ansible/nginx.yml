@@ -16,5 +16,5 @@
 
     - name: Deploy custom index page
       copy:
-        content: "<h1>Hello from DevOps Pipeline 🚀</h1>"
+        content: "<h1>Hello from DevOps Pipeline </h1>"
         dest: /usr/share/nginx/html/index.html
