@@ -4,7 +4,7 @@ provider "aws" {
 
 resource "aws_key_pair" "deployer" {
   key_name   = "devops-key"
-  public_key = file("~/.ssh/id_rsa.pub")
+  public_key = file("${path.module}/keys/devops-key.pub")
 }
 
 resource "aws_security_group" "nginx_sg" {
