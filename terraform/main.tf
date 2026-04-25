@@ -33,7 +33,7 @@ resource "aws_security_group" "nginx_sg" {
 }
 
 resource "aws_instance" "nginx_ec2" {
-  ami           = "ami-0f58b397bc5c1f2e8" # Amazon Linux 2 (update if needed)
+  ami           = "ami-098e39bafa7e7303d" # Amazon Linux 2 (update if needed)
   instance_type = "t3.micro"
   key_name      = aws_key_pair.deployer.key_name
 
