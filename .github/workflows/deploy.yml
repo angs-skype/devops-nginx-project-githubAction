@@ -1,0 +1,53 @@
+name: Deploy Infra + Nginx
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+        aws-region: ap-south-1
+
+    - name: Terraform Init
+      run: cd terraform && terraform init
+
+    - name: Terraform Apply
+      run: cd terraform && terraform apply -auto-approve
+
+    - name: Get Public IP
+      id: tf_output
+      run: |
+        cd terraform
+        echo "IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
+
+    - name: Install Ansible
+      run: sudo apt update && sudo apt install -y ansible
+
+    - name: Update Inventory
+      run: |
+        echo "[web]" > ansible/inventory.ini
+        echo "$IP ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
+
+    - name: Copy SSH Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: Run Ansible Playbook
+      run: ansible-playbook -i ansible/inventory.ini ansible/nginx.yml

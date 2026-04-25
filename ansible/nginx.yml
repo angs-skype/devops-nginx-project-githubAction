@@ -1,0 +1,20 @@
+- name: Install Custom Nginx
+  hosts: web
+  become: yes
+
+  tasks:
+    - name: Install nginx
+      yum:
+        name: nginx
+        state: present
+
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Deploy custom index page
+      copy:
+        content: "<h1>Hello from DevOps Pipeline 🚀</h1>"
+        dest: /usr/share/nginx/html/index.html
